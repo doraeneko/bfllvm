@@ -13,6 +13,7 @@ After building, you can use the executable like this:
 
     bfllvm --out my_file.bc < input.bf
 
+## Compiling BF programs
 The resulting LLVM bitfile can then be used as input e.g. to ``lli``. There is also a the simple shell script ``execute_it.sh`` in ``test`` to
 do compile and run ``lli`` in one:
 
