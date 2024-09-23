@@ -53,6 +53,7 @@ namespace bfllvm
         _char_zero = ConstantInt::get(_char_type, 0);
         _char_one = ConstantInt::get(_char_type, 1);
 
+        // create required libc function declarations
         FunctionType *putchar_type = FunctionType::get(
             _i32_type,
             {_i32_type},
@@ -80,18 +81,19 @@ namespace bfllvm
             "fflush",
             _module);
 
-        // we only need one main function
-        FunctionType *funcType = FunctionType::get(_i32_type, false);
-
-        _main = Function::Create(
-            funcType, Function::ExternalLinkage, "main", *_module);
-
+        // stdout global variable declaration
         _stdout = new GlobalVariable(
             *_module, _ptr_type, false, GlobalValue::ExternalLinkage, nullptr, "stdout");
         _stdout->setAlignment(Align(8));
+
+        // we only need one main function
+        FunctionType *funcType = FunctionType::get(_i32_type, false);
+        _main = Function::Create(
+            funcType, Function::ExternalLinkage, "main", *_module);
+
+        // create the bf array
         _array_type = ArrayType::get(_char_type, BF_ARRAY_SIZE);
         Constant *zero_init = ConstantAggregateZero::get(_array_type);
-        // Create the bf array
         _bf_array = new GlobalVariable(
             *_module,
             _array_type,
@@ -105,7 +107,7 @@ namespace bfllvm
     {
         init_structures();
 
-        // load the current_ptr 
+        // allocate current_ptr, store &bf_array[0]
         BasicBlock *entry_bb = BasicBlock::Create(*_context, "entry", _main);
         _builder->SetInsertPoint(entry_bb);
         _current_ptr = _builder->CreateAlloca(_ptr_type, nullptr, "current_ptr");
@@ -116,20 +118,25 @@ namespace bfllvm
         // generate bf code
         _ast->accept(*this);
 
+        // add an end block, always return 0 here.
         BasicBlock *end_bb = BasicBlock::Create(*_context, "end", _main);
         _builder->CreateBr(end_bb);
         _builder->SetInsertPoint(end_bb);
         _builder->CreateRet(_i32_zero);
-        verifyFunction(*_main);
+
+        // perform verification checks
+        verifyFunction(*_main, &errs());
         verifyModule(*_module, &errs());
+
         // _module->print(errs(), nullptr);
     }
 
     void Code_Gen_Visitor::output_current_value()
     {
+        // call putchar() with *(*_current_ptr)
         Value *ptr_value = _builder->CreateLoad(_ptr_type, _current_ptr);
         Value *out_value = _builder->CreateLoad(_char_type, ptr_value);
-
+        // extend to int
         out_value = _builder->CreateSExt(out_value, _i32_type);
         _builder->CreateCall(_putchar, out_value);
         Value *stdout_value = _builder->CreateLoad(_ptr_type, _stdout);
@@ -145,6 +152,7 @@ namespace bfllvm
 
     void Code_Gen_Visitor::visit(const Pointer_Increment &v)
     {
+        // increment (*_current_ptr)
         Value *ptr = _builder->CreateLoad(_ptr_type, _current_ptr);
         Value *inc_ptr = _builder->CreateGEP(_char_type, ptr, _i32_one);
         _builder->CreateStore(inc_ptr, _current_ptr);
@@ -152,6 +160,7 @@ namespace bfllvm
 
     void Code_Gen_Visitor::visit(const Pointer_Decrement &v)
     {
+        // decrement (*_current_ptr)
         Value *ptr = _builder->CreateLoad(_ptr_type, _current_ptr);
         Value *dec_ptr = _builder->CreateGEP(_char_type, ptr, _i32_minus_one);
         _builder->CreateStore(dec_ptr, _current_ptr);
@@ -159,6 +168,7 @@ namespace bfllvm
 
     void Code_Gen_Visitor::visit(const Value_Increment &v)
     {
+        // increment *(*_current_ptr)
         Value *ptr = _builder->CreateLoad(_ptr_type, _current_ptr);
         Value *old_value = _builder->CreateLoad(_char_type, ptr);
         Value *new_value = _builder->CreateAdd(old_value, _char_one);
@@ -167,6 +177,7 @@ namespace bfllvm
 
     void Code_Gen_Visitor::visit(const Value_Decrement &v)
     {
+        // decrement *(*_current_ptr)
         Value *ptr = _builder->CreateLoad(_ptr_type, _current_ptr);
         Value *old_value = _builder->CreateLoad(_char_type, ptr);
         Value *new_value = _builder->CreateSub(old_value, _char_one);
@@ -180,6 +191,7 @@ namespace bfllvm
 
     void Code_Gen_Visitor::visit(const Get_Char &v)
     {
+        // call getchar() and store the return value in *(*_current_ptr)
         Value *in_value = _builder->CreateCall(_getchar);
         in_value = _builder->CreateTrunc(in_value, _char_type);
         Value *ptr_value = _builder->CreateLoad(_ptr_type, _current_ptr);

@@ -1,6 +1,6 @@
 /*
 bfllvm
-(C) Andreas Gaiser, 2024
+(C) Andreas Gaiser (doraeneko), 2024
 Almost trivial AST for bf compiler.
  */
 
