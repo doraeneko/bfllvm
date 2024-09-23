@@ -209,20 +209,23 @@ namespace bfllvm
 
     void Code_Gen_Visitor::visit(const While_Loop &v)
     {
+        // create a block computing the condition *(*_current_ptr) != 0
         BasicBlock *cond_bb = BasicBlock::Create(*_context, "condition", _main);
         _builder->CreateBr(cond_bb);
         _builder->SetInsertPoint(cond_bb);
+        // create also a block for start of the loop, and one for code after the loop
         BasicBlock *loop_body_start_bb =
             BasicBlock::Create(*_context, "loop_body_start", _main);
         BasicBlock *after_loop_bb = BasicBlock::Create(*_context, "after_loop", _main);
 
-        // create *ptr == 0 check
+        // code for condition
         Value *ptr_value = _builder->CreateLoad(_ptr_type, _current_ptr);
         Value *deref_value = _builder->CreateLoad(_char_type, ptr_value);
         Value *comparison = _builder->CreateICmpNE(deref_value, _char_zero, "cmp");
         _builder->CreateCondBr(comparison, loop_body_start_bb, after_loop_bb);
-        _builder->SetInsertPoint(loop_body_start_bb);
 
+        // code for loop body
+        _builder->SetInsertPoint(loop_body_start_bb);
         // iterate over body
         uint32_t length = v.size();
         for (uint32_t i = 0; i < length; ++i)
@@ -230,11 +233,12 @@ namespace bfllvm
             v.get(i)->accept(*this);
         }
 
+        // create another block for jumping back to the condition
         BasicBlock *loop_jump_back_bb = BasicBlock::Create(*_context, "loop_back", _main);
-
-        _builder->CreateBr(loop_jump_back_bb); // jump to back bb
+        _builder->CreateBr(loop_jump_back_bb);
         _builder->SetInsertPoint(loop_jump_back_bb);
         _builder->CreateBr(cond_bb);
+        // set after loop block as continuation after the loop
         _builder->SetInsertPoint(after_loop_bb);
     }
 
