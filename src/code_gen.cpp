@@ -238,7 +238,8 @@ namespace bfllvm
         _builder->CreateBr(loop_jump_back_bb);
         _builder->SetInsertPoint(loop_jump_back_bb);
         _builder->CreateBr(cond_bb);
-        // set after loop block as continuation after the loop
+
+        // continue code generation with after loop block
         _builder->SetInsertPoint(after_loop_bb);
     }
 
