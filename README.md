@@ -25,6 +25,13 @@ The obligatory "hello word" in BF (from [therenegadecoder.com](https://therenega
 The compiler ``bfllvm`` contains a primitive hand-written lexer, parser, abstract syntax tree, and code generation for LLVM code for this
 mini language. I used it to familiarize myself with LLVMs facilities.
 
+## TODOs
+- The code generation is not optimal - the pointer into the array is realized via ``alloca``, it seems better to registers for storing this
+value. 
+- Things like ``>>>>>`` etc. scream for an optimization pass to replace it by a single ```add``` instruction :-)
+
+
+
 ## Building and Tests
 You need clang or g++, cmake, pytest and a decent llvm version (18 or better):
    
