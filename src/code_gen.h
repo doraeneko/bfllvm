@@ -59,13 +59,13 @@ namespace bfllvm
         llvm::GlobalVariable *_stdout{nullptr};
 
         // code generation functions
-    
+
         // emit code to call putchar(int)
         void output_current_value();
 
         // can be used for debugging
         void output_char(char number);
-    
+
         void visit(const Pointer_Decrement &v) override;
         void visit(const Pointer_Increment &v) override;
         void visit(const Value_Decrement &v) override;
