@@ -26,7 +26,7 @@ The compiler ``bfllvm`` contains a primitive hand-written lexer, parser, abstrac
 mini language. I used it to familiarize myself with LLVMs facilities.
 
 ## TODOs
-- The code generation is not optimal - the pointer into the array is realized via ``alloca``, it seems better to registers for storing this
+- The code generation is not optimal - the pointer into the array is realized via ``alloca``, it is probably better to use registers for storing this
 value. 
 - Things like ``>>>>>`` etc. scream for an optimization pass to replace it by a single ```add``` instruction :-)
 
