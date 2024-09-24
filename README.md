@@ -1,6 +1,6 @@
 # bfllvm
 
-A simple Brainf*ck ([BF](https://en.wikipedia.org/wiki/Brainfuck)) compiler that emits LLVM bitcode, designed for learning LLVM structures and having some fun along the way. BF is an esoteric programming language I discovered during my first university course on compilers. Its syntax and semantics are extremely minimalistic and closely resemble a Turing machine, nevertheless Turing-complete (under certain assumptions).
+A simple Brainf*ck ([BF](https://en.wikipedia.org/wiki/Brainfuck)) compiler that emits LLVM bitcode, designed for learning LLVM structures and having some fun along the way. BF is an esoteric programming language I discovered during my first university course on compilers. Its syntax and semantics are extremely minimalistic and closely resemble a Turing machine. It is Turing-complete under certain assumptions (e.g. infinite memory).
 
 Syntax:
   - BF programs are strings consisting of ``>`` , ``<``, ``+``, ``-``, ``.``, ``,``, ``[`` and ``]``. Other characters are allowed, but have no meaning
