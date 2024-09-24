@@ -27,67 +27,63 @@ LLVM Code generation for bf compiler.
 #include <string>
 #include <vector>
 
-namespace bfllvm
-{
+namespace bfllvm {
 
-    class Code_Gen_Visitor : public AST_Visitor
-    {
-        const AST &_ast;
+class Code_Gen_Visitor : public AST_Visitor {
+  const AST &_ast;
 
-        // builder structures
-        llvm::LLVMContext *_context;
-        llvm::IRBuilder<> *_builder;
-        llvm::Module *_module;
-        llvm::Function *_main;
+  // builder structures
+  llvm::LLVMContext *_context;
+  llvm::IRBuilder<> *_builder;
+  llvm::Module *_module;
+  llvm::Function *_main;
 
-        // llvm structures
-        llvm::Type *_i32_type{nullptr};
-        llvm::Type *_char_type{nullptr};
-        llvm::Type *_ptr_type{nullptr};
-        llvm::Type *_array_type{nullptr};
+  // llvm structures
+  llvm::Type *_i32_type{nullptr};
+  llvm::Type *_char_type{nullptr};
+  llvm::Type *_ptr_type{nullptr};
+  llvm::Type *_array_type{nullptr};
 
-        llvm::Constant *_i32_zero{nullptr};
-        llvm::Constant *_i32_minus_one{nullptr};
-        llvm::Constant *_i32_one{nullptr};
-        llvm::Constant *_char_zero{nullptr};
-        llvm::Constant *_char_one{nullptr};
-        llvm::Function *_putchar;
-        llvm::Function *_getchar;
-        llvm::Function *_fflush;
-        llvm::Value *_current_ptr{nullptr};
-        llvm::GlobalVariable *_bf_array{nullptr};
-        llvm::GlobalVariable *_stdout{nullptr};
+  llvm::Constant *_i32_zero{nullptr};
+  llvm::Constant *_i32_minus_one{nullptr};
+  llvm::Constant *_i32_one{nullptr};
+  llvm::Constant *_char_zero{nullptr};
+  llvm::Constant *_char_one{nullptr};
+  llvm::Function *_putchar;
+  llvm::Function *_getchar;
+  llvm::Function *_fflush;
+  llvm::Value *_current_ptr{nullptr};
+  llvm::GlobalVariable *_bf_array{nullptr};
+  llvm::GlobalVariable *_stdout{nullptr};
 
-        // code generation functions
+  // code generation functions
 
-        // emit code to call putchar(int)
-        void output_current_value();
+  // emit code to call putchar(int)
+  void output_current_value();
 
-        // can be used for debugging
-        void output_char(char number);
+  // can be used for debugging
+  void output_char(char number);
 
-        void visit(const Pointer_Decrement &v) override;
-        void visit(const Pointer_Increment &v) override;
-        void visit(const Value_Decrement &v) override;
-        void visit(const Value_Increment &v) override;
-        void visit(const Put_Char &v) override;
-        void visit(const Get_Char &v) override;
-        void visit(const Sequence &v) override;
-        void visit(const While_Loop &v) override;
+  void visit(const Pointer_Decrement &v) override;
+  void visit(const Pointer_Increment &v) override;
+  void visit(const Value_Decrement &v) override;
+  void visit(const Value_Increment &v) override;
+  void visit(const Put_Char &v) override;
+  void visit(const Get_Char &v) override;
+  void visit(const Sequence &v) override;
+  void visit(const While_Loop &v) override;
 
-        void init_structures();
+  void init_structures();
 
-    public:
-        Code_Gen_Visitor(const AST &ast)
-            : _ast{ast}, _context{}, _builder{}, _module{}, _main{}
-        {
-        }
+public:
+  Code_Gen_Visitor(const AST &ast)
+      : _ast{ast}, _context{}, _builder{}, _module{}, _main{} {}
 
-        void generate_code();
+  void generate_code();
 
-        void write_object_file(std::string out_file);
-    };
+  void write_object_file(std::string out_file);
+};
 
-}
+} // namespace bfllvm
 
 #endif

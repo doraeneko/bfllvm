@@ -10,41 +10,35 @@ Lexer for bfllvm.
 #include <cstdint>
 #include <istream>
 
-namespace bfllvm
-{
+namespace bfllvm {
 
-    enum class Token : std::uint32_t
-    {
-        PTR_INC = 0,
-        PTR_DEC,
-        VAL_INC,
-        VAL_DEC,
-        PUT_CHAR,
-        GET_CHAR,
-        WHILE_START,
-        WHILE_END,
-        OTHER,
-        END
-    };
+enum class Token : std::uint32_t {
+  PTR_INC = 0,
+  PTR_DEC,
+  VAL_INC,
+  VAL_DEC,
+  PUT_CHAR,
+  GET_CHAR,
+  WHILE_START,
+  WHILE_END,
+  OTHER,
+  END
+};
 
-    class Lexer
-    {
-        std::istream &_stream;
+class Lexer {
+  std::istream &_stream;
 
-    public:
-        Lexer(std::istream &stream)
-            : _stream(stream)
-        {
-        }
+public:
+  Lexer(std::istream &stream) : _stream(stream) {}
 
-        // remove next token from stream and return it
-        Token get_next();
-        // just peek the next token
-        Token peek();
+  // remove next token from stream and return it
+  Token get_next();
+  // just peek the next token
+  Token peek();
 
-        virtual ~Lexer() = default;
-    };
+  virtual ~Lexer() = default;
+};
 
-}
+} // namespace bfllvm
 
 #endif
